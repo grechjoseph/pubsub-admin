@@ -1,0 +1,1 @@
+Requires GOOGLE_APPLICATION_CREDENTIALS to be configured.
