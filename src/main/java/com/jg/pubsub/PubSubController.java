@@ -25,7 +25,7 @@ public class PubSubController {
             final PushConfig pushConfig = PushConfig.newBuilder()
                     .setPushEndpoint(request.getPushEndpoint())
                     .setOidcToken(PushConfig.OidcToken.newBuilder()
-                            .setServiceAccountEmail("publisher@jg-gcp.iam.gserviceaccount.com")
+                            .setServiceAccountEmail("user@principalwouldgo.here")
                             .setAudience("123")
                             .build())
                     .build();
