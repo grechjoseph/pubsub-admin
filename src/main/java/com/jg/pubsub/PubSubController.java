@@ -2,9 +2,7 @@ package com.jg.pubsub;
 
 import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
 import com.google.protobuf.Duration;
-import com.google.pubsub.v1.ExpirationPolicy;
-import com.google.pubsub.v1.PushConfig;
-import com.google.pubsub.v1.Subscription;
+import com.google.pubsub.v1.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,13 +20,19 @@ public class PubSubController {
     @PostMapping("/topics/{topicId}/subscriptions")
     public void createSubscription(@PathVariable final String topicId, @RequestBody final AddSubscriptionRequest request) {
         try (final SubscriptionAdminClient subscriptionAdminClient = SubscriptionAdminClient.create()) {
+            final TopicName topicName = TopicName.newBuilder().setProject(projectId).setTopic(topicId).build();
+            final SubscriptionName subscriptionName = SubscriptionName.newBuilder().setProject(projectId).setSubscription(request.getSubscriptionName()).build();
             final PushConfig pushConfig = PushConfig.newBuilder()
                     .setPushEndpoint(request.getPushEndpoint())
+                    .setOidcToken(PushConfig.OidcToken.newBuilder()
+                            .setServiceAccountEmail("publisher@jg-gcp.iam.gserviceaccount.com")
+                            .setAudience("123")
+                            .build())
                     .build();
 
             final Subscription subscriptionToCreate = Subscription.newBuilder()
-                    .setName("projects/jg-gcp/subscriptions/" + request.getSubscriptionName())
-                    .setTopic("projects/jg-gcp/topics/my-topic")
+                    .setName(subscriptionName.toString())
+                    .setTopic(topicName.toString())
                     .setMessageRetentionDuration(Duration.newBuilder().setSeconds(604800).build())
                     .setRetainAckedMessages(true)
                     .setExpirationPolicy(ExpirationPolicy.newBuilder().setTtl(Duration.newBuilder().setSeconds(2592000).build()).build())
